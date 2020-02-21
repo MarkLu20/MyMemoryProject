@@ -65,11 +65,11 @@ void AMemoryRecordActor::StartRecord()
 			IFileManager::Get().DeleteDirectory(*MemoryPath, false, true);
 		}
 		IFileManager::Get().MakeDirectory(*MemoryPath, true);
-		UKismetSystemLibrary::ExecuteConsoleCommand(this, TEXT("MemReport-full"));
+		GEngine->HandleMemReportCommand(TEXT("MemReport -full"), *GLog, GetWorld());
 		FTimerHandle RecordHourHandle;
 		GetWorld()->GetTimerManager().SetTimer(RecordHourHandle, [&](void)
 		{
-			UKismetSystemLibrary::ExecuteConsoleCommand(this, TEXT("MemReport-full"));
+			GEngine->HandleMemReportCommand(TEXT("MemReport -full"), *GLog, GetWorld());
 			FTimerHandle DiffHandle;
 			GetWorld()->GetTimerManager().SetTimer(DiffHandle, [&]()
 			{
