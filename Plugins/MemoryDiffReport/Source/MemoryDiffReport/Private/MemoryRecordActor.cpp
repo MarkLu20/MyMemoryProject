@@ -21,28 +21,26 @@ AMemoryRecordActor::AMemoryRecordActor()
 void AMemoryRecordActor::BeginPlay()
 {
 	Super::BeginPlay();
-	if (!GIsEditor)
+#if WITH_EDITOR
+	if (ERecordType::Editor == RecordType)
 	{
-		if (ERecordType::OnlyDedicatedServer == RecordType && IsRunningDedicatedServer())
-		{
-			StartRecord();
-			
-		}
-		else if (ERecordType::OnyClient == RecordType && IsRunningClientOnly())
-		{
-			StartRecord();
-		}
-		else if (ERecordType::All == RecordType)
-		{
-			StartRecord();
-		}
-		
+		StartRecord();
 	}
+#else
+	if (ERecordType::OnlyDedicatedServer == RecordType && IsRunningDedicatedServer())
+	{
+		StartRecord();
 
-	//StartRecord();
-
-	//GetWorld()->Exec(GetWorld(),TEXT("")
-
+	}
+	else if (ERecordType::OnyClient == RecordType && IsRunningClientOnly())
+	{
+		StartRecord();
+	}
+	else if (ERecordType::AllGame == RecordType)
+	{
+		StartRecord();
+	}
+#endif
 }
 
 // Called every frame
@@ -54,38 +52,38 @@ void AMemoryRecordActor::Tick(float DeltaTime)
 
 void AMemoryRecordActor::StartRecord()
 {
-	
-	
-	
+
+
+
 	auto StartRecordFunc = [&]()
 	{
 		UE_LOG(LogTemp, Error, TEXT("StartRecording............. StartDelayHour %f"), StartDelayHour * 60 * 60);
-	FString MemoryPath = FPaths::ProjectSavedDir() / TEXT("Profiling") / TEXT("MemReports");
-	
-	if (IFileManager::Get().DirectoryExists(*MemoryPath))
-	{
-		IFileManager::Get().DeleteDirectory(*MemoryPath, false, true);
-	}
-	IFileManager::Get().MakeDirectory(*MemoryPath, true);
-	UKismetSystemLibrary::ExecuteConsoleCommand(this, TEXT("MemReport-full"));
-	FTimerHandle RecordHourHandle;
-	GetWorld()->GetTimerManager().SetTimer(RecordHourHandle, [&](void)
-	{
-		UKismetSystemLibrary::ExecuteConsoleCommand(this, TEXT("MemReport-full"));
-		FTimerHandle DiffHandle;
-		GetWorld()->GetTimerManager().SetTimer(DiffHandle, [&]() 
+		FString MemoryPath = FPaths::ProjectSavedDir() / TEXT("Profiling") / TEXT("MemReports");
+
+		if (IFileManager::Get().DirectoryExists(*MemoryPath))
 		{
-			FString FullPlugintDir = FPaths::ConvertRelativePathToFull(FPaths::ProjectPluginsDir()) ;
-			FString CurrentDir = FullPlugintDir / TEXT("MemoryDiffReport") / TEXT("Binaries") / TEXT("Win64");
-			FString FullBatExeDir = CurrentDir / TEXT("MemoryReport.exe");
-			auto Handler = FPlatformProcess::CreateProc(*FullBatExeDir, nullptr, false, false, false, nullptr,0, *CurrentDir, nullptr);
-			FTimerHandle ReaptRecord;
-			GetWorld()->GetTimerManager().SetTimer(ReaptRecord,this,&AMemoryRecordActor::StartRecord, 30.0f,false);
+			IFileManager::Get().DeleteDirectory(*MemoryPath, false, true);
+		}
+		IFileManager::Get().MakeDirectory(*MemoryPath, true);
+		UKismetSystemLibrary::ExecuteConsoleCommand(this, TEXT("MemReport-full"));
+		FTimerHandle RecordHourHandle;
+		GetWorld()->GetTimerManager().SetTimer(RecordHourHandle, [&](void)
+		{
+			UKismetSystemLibrary::ExecuteConsoleCommand(this, TEXT("MemReport-full"));
+			FTimerHandle DiffHandle;
+			GetWorld()->GetTimerManager().SetTimer(DiffHandle, [&]()
+			{
+				FString FullPlugintDir = FPaths::ConvertRelativePathToFull(FPaths::ProjectPluginsDir());
+				FString CurrentDir = FullPlugintDir / TEXT("MemoryDiffReport") / TEXT("Binaries") / TEXT("Win64");
+				FString FullBatExeDir = CurrentDir / TEXT("MemoryReport.exe");
+				auto Handler = FPlatformProcess::CreateProc(*FullBatExeDir, nullptr, false, false, false, nullptr, 0, *CurrentDir, nullptr);
+				FTimerHandle ReaptRecord;
+				GetWorld()->GetTimerManager().SetTimer(ReaptRecord, this, &AMemoryRecordActor::StartRecord, 30.0f, false);
 
-		}, 15.0f, false);
+			}, 15.0f, false);
 
-	}, RecordHour * 60 * 60, false);
-	
+		}, RecordHour * 60 * 60, false);
+
 	};
 	FTimerHandle TempHandle;
 	GetWorld()->GetTimerManager().SetTimer(TempHandle, StartRecordFunc, StartDelayHour * 60 * 60, false);

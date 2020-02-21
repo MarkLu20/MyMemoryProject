@@ -11,7 +11,8 @@ enum class ERecordType :uint8
 {
 	OnlyDedicatedServer,
 	OnyClient,
-	All
+	AllGame,
+	Editor
 
 
 
