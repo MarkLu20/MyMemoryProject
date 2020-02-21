@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{C37C7C04-4590-D2C5-8253-4E97B240175F}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "MyMemoryProject",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

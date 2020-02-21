@@ -1,0 +1,1 @@
+F:\UE4Soul_DevEngine\Engine\Build\BatchFiles\RunUAT.bat BuildCookRun -project=E:\UEProject\MyMemoryProject\MyMemoryProject.uproject -noP4 -platform=Win64 -clientconfig=Development -serverconfig=Development -serverconfig=Development -cook -server -serverplatform=Win64 -noclient -build -stage -pak -archive -archivedirectory=F:\BatPackage
