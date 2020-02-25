@@ -57,7 +57,7 @@ void AMemoryRecordActor::StartRecord()
 
 	auto StartRecordFunc = [&]()
 	{
-		UE_LOG(LogTemp, Error, TEXT("StartRecording............. StartDelayHour %f"), StartDelayHour * 60 * 60);
+		//UE_LOG(LogTemp, Error, TEXT("StartRecording............. StartDelayHour %f"), StartDelayHour * 60 * 60);
 		FString MemoryPath = FPaths::ProjectSavedDir() / TEXT("Profiling") / TEXT("MemReports");
 
 		if (IFileManager::Get().DirectoryExists(*MemoryPath))
